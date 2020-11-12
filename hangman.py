@@ -65,8 +65,6 @@ def is_word_guessed(secret_word, letters_guessed):
         list(secret_word))  # Discrete Math is the best.
 
 
-
-
 def get_guessed_word(secret_word, letters_guessed):
     '''
     secret_word: string, the word the user is guessing
@@ -76,12 +74,14 @@ def get_guessed_word(secret_word, letters_guessed):
     '''
     # FILL IN YOUR CODE HERE AND DELETE "pass"
 
-    result=''
-    secret_word_list=list(secret_word)
+    result = ''
+    secret_word_list = list(secret_word)
     for i in secret_word_list: result += i if i in letters_guessed else "_ "
     return result
-    #it's not the most fast, but I think here fast is not very important(words are small)
+    # it's not the most fast, but I think here fast is not very important(words are small)
 
+
+import string
 
 
 def get_available_letters(letters_guessed):
@@ -91,8 +91,8 @@ def get_available_letters(letters_guessed):
       yet been guessed.
     '''
     # FILL IN YOUR CODE HERE AND DELETE "pass"
-    pass
-
+    return "".join(sorted(list(set(list(string.ascii_lowercase)).difference(set(letters_guessed)))))
+    #Functional programming and discrete mathematics 💪🙂
 
 def hangman(secret_word):
     '''
@@ -120,7 +120,8 @@ def hangman(secret_word):
     Follows the other limitations detailed in the problem write-up.
     '''
     # FILL IN YOUR CODE HERE AND DELETE "pass"
-    pass
+    #print("Welcome to the game Hangman!")
+    #print(f'I am thinking of a word that is {len(secret_word)} letters long.')
 
 
 # When you've completed your hangman function, scroll down to the bottom
