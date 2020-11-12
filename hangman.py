@@ -33,7 +33,6 @@ def load_words():
     return wordlist
 
 
-
 def choose_word(wordlist):
     """
     wordlist (list): list of words (strings)
@@ -41,6 +40,7 @@ def choose_word(wordlist):
     Returns a word from wordlist at random
     """
     return random.choice(wordlist)
+
 
 # end of helper code
 
@@ -61,7 +61,9 @@ def is_word_guessed(secret_word, letters_guessed):
       False otherwise
     '''
     # FILL IN YOUR CODE HERE AND DELETE "pass"
-    pass
+    return set(letters_guessed).intersection(set(list(secret_word))) == set(
+        list(secret_word))  # Discrete Math is the best.
+
 
 
 
@@ -73,7 +75,12 @@ def get_guessed_word(secret_word, letters_guessed):
       which letters in secret_word have been guessed so far.
     '''
     # FILL IN YOUR CODE HERE AND DELETE "pass"
-    pass
+
+    result=''
+    secret_word_list=list(secret_word)
+    for i in secret_word_list: result += i if i in letters_guessed else "_ "
+    return result
+    #it's not the most fast, but I think here fast is not very important(words are small)
 
 
 
@@ -85,8 +92,7 @@ def get_available_letters(letters_guessed):
     '''
     # FILL IN YOUR CODE HERE AND DELETE "pass"
     pass
-    
-    
+
 
 def hangman(secret_word):
     '''
@@ -117,15 +123,13 @@ def hangman(secret_word):
     pass
 
 
-
 # When you've completed your hangman function, scroll down to the bottom
 # of the file and uncomment the first two lines to test
-#(hint: you might want to pick your own
+# (hint: you might want to pick your own
 # secret_word while you're doing your own testing)
 
 
 # -----------------------------------
-
 
 
 def match_with_gaps(my_word, other_word):
@@ -141,7 +145,6 @@ def match_with_gaps(my_word, other_word):
     pass
 
 
-
 def show_possible_matches(my_word):
     '''
     my_word: string with _ characters, current guess of secret word
@@ -154,7 +157,6 @@ def show_possible_matches(my_word):
     '''
     # FILL IN YOUR CODE HERE AND DELETE "pass"
     pass
-
 
 
 def hangman_with_hints(secret_word):
@@ -188,7 +190,6 @@ def hangman_with_hints(secret_word):
     pass
 
 
-
 # When you've completed your hangman_with_hint function, comment the two similar
 # lines above that were used to run the hangman function, and then uncomment
 # these two lines and run this file to test!
@@ -200,14 +201,14 @@ if __name__ == "__main__":
 
     # To test part 2, comment out the pass line above and
     # uncomment the following two lines.
-    
+
     secret_word = choose_word(wordlist)
     hangman(secret_word)
 
 ###############
-    
-    # To test part 3 re-comment out the above lines and 
-    # uncomment the following two lines. 
-    
-    #secret_word = choose_word(wordlist)
-    #hangman_with_hints(secret_word)
+
+# To test part 3 re-comment out the above lines and
+# uncomment the following two lines.
+
+# secret_word = choose_word(wordlist)
+# hangman_with_hints(secret_word)
