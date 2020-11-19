@@ -81,9 +81,6 @@ def get_guessed_word(secret_word, letters_guessed):
     # it's not the most fast, but I think here fast is not very important(words are small)
 
 
-import string
-
-
 def get_available_letters(letters_guessed):
     '''
     letters_guessed: list (of letters), which letters have been guessed so far
@@ -92,7 +89,36 @@ def get_available_letters(letters_guessed):
     '''
     # FILL IN YOUR CODE HERE AND DELETE "pass"
     return "".join(sorted(list(set(list(string.ascii_lowercase)).difference(set(letters_guessed)))))
-    #Functional programming and discrete mathematics 💪🙂
+    # Functional programming and discrete mathematics 💪🙂
+
+
+def if_bad(key, warnings_remaining, guesses_remaining, guessed_word):
+    '''
+    It's function for checking not normal inputs.
+    '''
+    if key == 1:
+        if warnings_remaining != 0:
+            warnings_remaining -= 1
+            print(f'Oops! That is not a valid letter. You have {warnings_remaining} warnings left: {guessed_word}')
+            print("-------------")
+        else:
+            guesses_remaining -= 1
+            print(
+                f'Oops! That is not a valid letter. You have no warnings left so you lose one guess: {guessed_word}')
+            print("-------------")
+    else:
+        if warnings_remaining != 0:
+            warnings_remaining -= 1
+            print(
+                f'Oops! You have already guessed that letter. You have {warnings_remaining} warnings left: {guessed_word}')
+            print("-------------")
+        else:
+            guesses_remaining -= 1
+            print(
+                f'Oops! You have already guessed that letter. You have no warnings left so you lose one guess: {guessed_word}')
+            print("-------------")
+    return warnings_remaining, guesses_remaining, guessed_word
+
 
 def hangman(secret_word):
     '''
@@ -120,8 +146,15 @@ def hangman(secret_word):
     Follows the other limitations detailed in the problem write-up.
     '''
     # FILL IN YOUR CODE HERE AND DELETE "pass"
-    #print("Welcome to the game Hangman!")
-    #print(f'I am thinking of a word that is {len(secret_word)} letters long.')
+    warnings_remaining = 3
+    guesses_remaining = 6
+    letters_guessed = []
+    guessed_word = get_guessed_word(secret_word, letters_guessed)
+    available_letters = get_available_letters(letters_guessed)
+    print("Welcome to the game Hangman!")
+    print(f'I am thinking of a word that is {len(secret_word)} letters long.')
+    print(f'You have {warnings_remaining} warnings left.')
+    print("-------------")
 
 
 # When you've completed your hangman function, scroll down to the bottom
@@ -176,7 +209,7 @@ def hangman_with_hints(secret_word):
     
     * Ask the user to supply one guess per round. Make sure to check that the user guesses a letter
       
-    * The user should receive feedback immediately after each guess 
+    * The user should receive feedback immediately after each guess
       about whether their guess appears in the computer's word.
 
     * After each guess, you should display to the user the 
@@ -188,7 +221,6 @@ def hangman_with_hints(secret_word):
     Follows the other limitations detailed in the problem write-up.
     '''
     # FILL IN YOUR CODE HERE AND DELETE "pass"
-    pass
 
 
 # When you've completed your hangman_with_hint function, comment the two similar
