@@ -119,6 +119,7 @@ def if_bad(key, warnings_remaining, guesses_remaining, guessed_word):
             print("-------------")
     return warnings_remaining, guesses_remaining, guessed_word
 
+
 def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
                      available_letters):
     '''
@@ -151,9 +152,11 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
             print(f'Good guess: {guessed_word}')
             print("-------------")
             if is_word_guessed(secret_word, letters_guessed):
-                return f'Congratulations, you won! Your total score for this game is: {len(secret_word) * guesses_remaining}'
+                return print(
+                    f'Congratulations, you won! Your total score for this game is: {len(secret_word) * guesses_remaining}')
     interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
                      available_letters)
+
 
 def hangman(secret_word):
     '''
@@ -192,6 +195,7 @@ def hangman(secret_word):
     print("-------------")
     interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
                      available_letters)
+
 
 # When you've completed your hangman function, scroll down to the bottom
 # of the file and uncomment the first two lines to test
