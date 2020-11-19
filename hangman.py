@@ -119,6 +119,41 @@ def if_bad(key, warnings_remaining, guesses_remaining, guessed_word):
             print("-------------")
     return warnings_remaining, guesses_remaining, guessed_word
 
+def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
+                     available_letters):
+    '''
+    It is the interactive game or main part of hangman function.
+    '''
+    if not guesses_remaining:
+        return print(f'Sorry, you ran out of guesses. The word was {secret_word}')
+    print(f'You have {guesses_remaining} guesses left.')
+    print(f'Available letters: {available_letters}')
+    letter = str(input('Please guess a letter: '))
+    if not str.isalpha(letter):
+        warnings_remaining, guesses_remaining, guessed_word = if_bad(1, warnings_remaining, guesses_remaining,
+                                                                     guessed_word)
+    elif str.lower(letter) in letters_guessed:
+        warnings_remaining, guesses_remaining, guessed_word = if_bad(2, warnings_remaining, guesses_remaining,
+                                                                     guessed_word)
+    else:
+        letter = str.lower(letter)
+        letters_guessed.append(letter)
+        available_letters = get_available_letters(letters_guessed)
+        if guessed_word == get_guessed_word(secret_word, letters_guessed):
+            if letter in 'aeiou':
+                guesses_remaining -= 2
+            else:
+                guesses_remaining -= 1
+            print(f'Oops! That letter is not in my word: {guessed_word}')
+            print("-------------")
+        else:
+            guessed_word = get_guessed_word(secret_word, letters_guessed)
+            print(f'Good guess: {guessed_word}')
+            print("-------------")
+            if is_word_guessed(secret_word, letters_guessed):
+                return f'Congratulations, you won! Your total score for this game is: {len(secret_word) * guesses_remaining}'
+    interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
+                     available_letters)
 
 def hangman(secret_word):
     '''
@@ -155,7 +190,8 @@ def hangman(secret_word):
     print(f'I am thinking of a word that is {len(secret_word)} letters long.')
     print(f'You have {warnings_remaining} warnings left.')
     print("-------------")
-
+    interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
+                     available_letters)
 
 # When you've completed your hangman function, scroll down to the bottom
 # of the file and uncomment the first two lines to test
