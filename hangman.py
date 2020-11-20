@@ -204,9 +204,13 @@ def hangman(secret_word):
 
 
 # -----------------------------------
+def replace(x):
+    '''
+    A small function for change list
+    '''
+    return '' if x == ' ' else x
 
-
-def match_with_gaps(my_word, other_word):
+def smatch_with_gap(my_word, other_word):
     '''
     my_word: string with _ characters, current guess of secret word
     other_word: string, regular English word
@@ -215,8 +219,19 @@ def match_with_gaps(my_word, other_word):
         _ , and my_word and other_word are of the same length;
         False otherwise: 
     '''
-    # FILL IN YOUR CODE HERE AND DELETE "pass"
-    pass
+
+    my_word = "".join(list(map(replace, my_word)))
+    my_word_parts = list(my_word.split('_'))
+
+    if len(my_word) != len(other_word):
+        return False
+    elif '_' in my_word and set(my_word) == set(other_word + '_'):
+        return False
+    else:
+        for i in my_word_parts:
+            if i not in other_word:
+                return False
+    return True
 
 
 def show_possible_matches(my_word):
