@@ -1,16 +1,15 @@
 # Problem Set 2, hangman.py
-# Name: 
+# Name: Bohdan Klots
 # Collaborators:
 # Time spent:
 
 # Hangman Game
 # -----------------------------------
 # Helper code
-# You don't need to understand this helper code,
-# but you will have to know how to use the functions
-# (so be sure to read the docstrings!)
+
 import random
 import string
+from functools import reduce
 
 WORDLIST_FILENAME = "words.txt"
 
@@ -18,16 +17,12 @@ WORDLIST_FILENAME = "words.txt"
 def load_words():
     """
     Returns a list of valid words. Words are strings of lowercase letters.
-    
     Depending on the size of the word list, this function may
     take a while to finish.
     """
     print("Loading word list from file...")
-    # inFile: file
     inFile = open(WORDLIST_FILENAME, 'r')
-    # line: string
     line = inFile.readline()
-    # wordlist: list of strings
     wordlist = line.split()
     print("  ", len(wordlist), "words loaded.")
     return wordlist
@@ -72,12 +67,10 @@ def get_guessed_word(secret_word, letters_guessed):
       which letters in secret_word have been guessed so far.
     '''
     # FILL IN YOUR CODE HERE AND DELETE "pass"
-
-    result = ''
-    for i in secret_word:
-        result += i if i in letters_guessed else "_ "
-    return result
-    # it's not the most fast, but I think here fast is not very important(words are small)
+    if secret_word[:1] in letters_guessed:
+        return reduce(lambda x, y: x + y if y in letters_guessed else x + '_ ', secret_word)
+    else:
+        return '_ ' + reduce(lambda x, y: x + y if y in letters_guessed else x + '_ ', secret_word)[1:]
 
 
 def get_available_letters(letters_guessed):
@@ -297,13 +290,6 @@ def hangman_with_hints(secret_word):
     with_hints = True
     interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
                      available_letters, with_hints)
-
-
-# When you've completed your hangman_with_hint function, comment the two similar
-# lines above that were used to run the hangman function, and then uncomment
-# these two lines and run this file to test!
-# Hint: You might want to pick your own secret_word while you're testing.
-
 
 if __name__ == "__main__":
     pass
