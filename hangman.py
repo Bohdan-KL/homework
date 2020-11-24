@@ -60,7 +60,7 @@ def is_word_guessed(secret_word, letters_guessed):
     Intersection of two plurals is all elements which is in both plurals.
     Discrete Math is the best.
     '''
-    secret_word_set=set(secret_word)
+    secret_word_set = set(secret_word)
     return set(letters_guessed).intersection(secret_word_set) == secret_word_set
 
 
@@ -82,8 +82,10 @@ def get_available_letters(letters_guessed):
     letters_guessed: list (of letters), which letters have been guessed so far
     returns: string (of letters), comprised of letters that represents which letters have not
       yet been guessed.
+      Filter is removing false letters.
     '''
-    return "".join(sorted(list(set(string.ascii_lowercase).difference(set(letters_guessed)))))
+    all_letters = list(string.ascii_lowercase)
+    return "".join(filter(lambda x: x not in letters_guessed, all_letters))
 
 
 def if_bad(key, warnings_remaining, guesses_remaining, guessed_word):
@@ -283,6 +285,7 @@ def hangman_with_hints(secret_word):
     with_hints = True
     interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
                      available_letters, with_hints)
+
 
 if __name__ == "__main__":
     pass
