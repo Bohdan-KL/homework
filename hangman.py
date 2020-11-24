@@ -158,16 +158,16 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
     with_hints: True if user is playing whith hints, else False
     '''
     if not guesses_remaining:
-        return print(f'Sorry, you ran out of guesses. The word was {secret_word}')
+        return False
     letter = inform_and_input(guesses_remaining, available_letters)
     if letter == '*' and with_hints:
         show_possible_matches(guessed_word)
     elif not str.isalpha(letter):
         warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(1, warnings_remaining, guesses_remaining,
-                                                                     guessed_word)
+                                                                            guessed_word)
     elif str.lower(letter) in letters_guessed:
         warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(2, warnings_remaining, guesses_remaining,
-                                                                     guessed_word)
+                                                                            guessed_word)
     else:
         letter = str.lower(letter)
         letters_guessed.append(letter)
@@ -184,9 +184,7 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
             print(f'Good guess: {guessed_word}')
             print('-------------')
             if is_word_guessed(secret_word, letters_guessed):
-                return print(
-                    f'Congratulations, you won! Your total score for this game is: '
-                    f'{len(secret_word) * guesses_remaining}')
+                return True
     interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
                      available_letters, with_hints)
 
@@ -225,8 +223,13 @@ def hangman(secret_word):
     print(f'You have {warnings_remaining} warnings left.')
     print("-------------")
     with_hints = False
-    interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
-                     available_letters, with_hints)
+    win = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
+                           available_letters, with_hints)
+    if win:
+        print(f'Congratulations, you won! Your total score for this game is: '
+              f'{len(secret_word) * guesses_remaining}')
+    else:
+        print(f'Sorry, you ran out of guesses. The word was {secret_word}')
 
 
 def match_with_gaps(my_word, other_word):
@@ -305,8 +308,13 @@ def hangman_with_hints(secret_word):
     print(f'You have {warnings_remaining} warnings left.')
     print("-------------")
     with_hints = True
-    interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
-                     available_letters, with_hints)
+    win = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
+                           available_letters, with_hints)
+    if win:
+        print(f'Congratulations, you won! Your total score for this game is: '
+              f'{len(secret_word) * guesses_remaining}')
+    else:
+        print(f'Sorry, you ran out of guesses. The word was {secret_word}')
 
 
 if __name__ == "__main__":
