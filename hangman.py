@@ -54,9 +54,14 @@ def is_word_guessed(secret_word, letters_guessed):
       assumes that all letters are lowercase
     returns: boolean, True if all the letters of secret_word are in letters_guessed;
       False otherwise
+
+    Here used the property of plurals. The program find out intersection of letters_guessed
+    plurals and secret_word_set plurals is equal to secret_word_set plurals or no.
+    Intersection of two plurals is all elements which is in both plurals.
+    Discrete Math is the best.
     '''
-    # FILL IN YOUR CODE HERE AND DELETE "pass"
-    return set(letters_guessed).intersection(set(secret_word)) == set(secret_word)  # Discrete Math is the best.
+    secret_word_set=set(secret_word)
+    return set(letters_guessed).intersection(secret_word_set) == secret_word_set
 
 
 def get_guessed_word(secret_word, letters_guessed):
@@ -66,7 +71,6 @@ def get_guessed_word(secret_word, letters_guessed):
     returns: string, comprised of letters, underscores (_), and spaces that represents
       which letters in secret_word have been guessed so far.
     '''
-    # FILL IN YOUR CODE HERE AND DELETE "pass"
     if secret_word[:1] in letters_guessed:
         return reduce(lambda x, y: x + y if y in letters_guessed else x + '_ ', secret_word)
     else:
@@ -79,9 +83,7 @@ def get_available_letters(letters_guessed):
     returns: string (of letters), comprised of letters that represents which letters have not
       yet been guessed.
     '''
-    # FILL IN YOUR CODE HERE AND DELETE "pass"
     return "".join(sorted(list(set(string.ascii_lowercase).difference(set(letters_guessed)))))
-    # Functional programming and discrete mathematics 💪🙂
 
 
 def if_bad(key, warnings_remaining, guesses_remaining, guessed_word):
@@ -183,7 +185,6 @@ def hangman(secret_word):
     
     Follows the other limitations detailed in the problem write-up.
     '''
-    # FILL IN YOUR CODE HERE AND DELETE "pass"
     warnings_remaining, guesses_remaining = 3, 6
     letters_guessed = []
     guessed_word = get_guessed_word(secret_word, letters_guessed)
@@ -197,13 +198,6 @@ def hangman(secret_word):
                      available_letters, with_hints)
 
 
-# When you've completed your hangman function, scroll down to the bottom
-# of the file and uncomment the first two lines to test
-# (hint: you might want to pick your own
-# secret_word while you're doing your own testing)
-
-
-# -----------------------------------
 def replace(x):
     '''
     A small function for change list
@@ -278,7 +272,6 @@ def hangman_with_hints(secret_word):
     
     Follows the other limitations detailed in the problem write-up.
     '''
-    # FILL IN YOUR CODE HERE AND DELETE "pass"
     warnings_remaining, guesses_remaining = 3, 6
     letters_guessed = []
     guessed_word = get_guessed_word(secret_word, letters_guessed)
