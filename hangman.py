@@ -88,38 +88,55 @@ def get_available_letters(letters_guessed):
     return "".join(filter(lambda x: x not in letters_guessed, all_letters))
 
 
-def if_bad(key, warnings_remaining, guesses_remaining, guessed_word):
+def answer_if_bad(key, warnings_remaining, guesses_remaining, guessed_word):
     '''
-    It's function for checking not normal inputs.
+    It's function for checking not normal inputs and printing results.
+    key: View what problem we check. Is not a valid letter(key=1) or user have already guessed that letter(key=2).
+    warnings_remaining: how many warnings remaining user have
+    guesses_remaining: how many guesses remaining user have
+    guessed_word: a guessed word at this moment
+
+    return: changed warnings_remaining, guesses_remaining, guessed_word
     '''
     if key == 1:
         if warnings_remaining != 0:
             warnings_remaining -= 1
             print(f'Oops! That is not a valid letter. You have {warnings_remaining} '
-                  f'warnings left: {guessed_word}\n-------------')
+                  f'warnings left: {guessed_word}')
+            print('-------------')
         else:
             guesses_remaining -= 1
             print(
                 f'Oops! That is not a valid letter. You have no warnings left so you '
-                f'lose one guess: {guessed_word}\n-------------')
+                f'lose one guess: {guessed_word}')
+            print('-------------')
     else:
         if warnings_remaining != 0:
             warnings_remaining -= 1
             print(
                 f'Oops! You have already guessed that letter. You have {warnings_remaining} '
-                f'warnings left: {guessed_word}\n-------------')
+                f'warnings left: {guessed_word}')
+            print('-------------')
         else:
             guesses_remaining -= 1
             print(
                 f'Oops! You have already guessed that letter. You have no warnings left so you '
-                f'lose one guess: {guessed_word}\n-------------')
+                f'lose one guess: {guessed_word}')
+            print('-------------')
     return warnings_remaining, guesses_remaining, guessed_word
 
 
 def inform_and_input(guesses_remaining, available_letters):
     '''
-    interactive_game should be small
+    guesses_remaining: parameter for inform user how many guesses remaining he has.
+    available_letters: parameter for inform user how many guesses remaining he has.
+
+    return: something what user wrote.
+
+    interactive_game should be small. This function made for making
+    interactive_game function smaller and more easy to understand.
     '''
+
     print(f'You have {guesses_remaining} guesses left.')
     print(f'Available letters: {available_letters}')
     return input('Please guess a letter: ')
@@ -129,6 +146,16 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
                      available_letters, with_hints):
     '''
     It is the interactive game or main part of hangman function.
+    It is a recursive function, which would be run while guesses_remaining is not zero or while
+    user not win.
+
+    warnings_remaining: how many warnings remaining user have
+    guesses_remaining: how many guesses remaining user have
+    guessed_word: guessed word at this moment
+    letters_guessed: list (of letters), which letters have been guessed so far
+    secret_word: word which computer choose
+    available_letters: parameter for inform user how many guesses remaining he has.
+    with_hints: True if user is playing whith hints, else False
     '''
     if not guesses_remaining:
         return print(f'Sorry, you ran out of guesses. The word was {secret_word}')
@@ -136,10 +163,10 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
     if letter == '*' and with_hints:
         show_possible_matches(guessed_word)
     elif not str.isalpha(letter):
-        warnings_remaining, guesses_remaining, guessed_word = if_bad(1, warnings_remaining, guesses_remaining,
+        warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(1, warnings_remaining, guesses_remaining,
                                                                      guessed_word)
     elif str.lower(letter) in letters_guessed:
-        warnings_remaining, guesses_remaining, guessed_word = if_bad(2, warnings_remaining, guesses_remaining,
+        warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(2, warnings_remaining, guesses_remaining,
                                                                      guessed_word)
     else:
         letter = str.lower(letter)
@@ -150,10 +177,12 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
                 guesses_remaining -= 2
             else:
                 guesses_remaining -= 1
-            print(f'Oops! That letter is not in my word: {guessed_word}\n-------------')
+            print(f'Oops! That letter is not in my word: {guessed_word}')
+            print('-------------')
         else:
             guessed_word = get_guessed_word(secret_word, letters_guessed)
-            print(f'Good guess: {guessed_word}\n-------------')
+            print(f'Good guess: {guessed_word}')
+            print('-------------')
             if is_word_guessed(secret_word, letters_guessed):
                 return print(
                     f'Congratulations, you won! Your total score for this game is: '
@@ -198,13 +227,6 @@ def hangman(secret_word):
     with_hints = False
     interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
                      available_letters, with_hints)
-
-
-def replace(x):
-    '''
-    A small function for change list
-    '''
-    return '' if x == ' ' else x
 
 
 def match_with_gaps(my_word, other_word):
