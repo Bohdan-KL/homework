@@ -157,36 +157,37 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
     available_letters: parameter for inform user how many guesses remaining he has.
     with_hints: True if user is playing whith hints, else False
     '''
-    if not guesses_remaining:
+    if not guesses_remaining:  # check is user lose
         return False
-    letter = inform_and_input(guesses_remaining, available_letters)
-    if letter == '*' and with_hints:
+    letter = inform_and_input(guesses_remaining, available_letters)  # reed the letter
+    if letter == '*' and with_hints:  # check is user use hint
         show_possible_matches(guessed_word)
-    elif not str.isalpha(letter):
+    elif not str.isalpha(letter):  # chek is user input a correct letter
         warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(1, warnings_remaining, guesses_remaining,
                                                                             guessed_word)
-    elif str.lower(letter) in letters_guessed:
+    elif str.lower(letter) in letters_guessed:  # check is user input a new letter
         warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(2, warnings_remaining, guesses_remaining,
                                                                             guessed_word)
-    else:
+    else:  # if a letter is new and not invalid, run this
         letter = str.lower(letter)
         letters_guessed.append(letter)
         available_letters = get_available_letters(letters_guessed)
-        if guessed_word == get_guessed_word(secret_word, letters_guessed):
+
+        if guessed_word == get_guessed_word(secret_word, letters_guessed):  # check is a letter in secret word
             if letter in 'aeiou':
                 guesses_remaining -= 2
             else:
                 guesses_remaining -= 1
             print(f'Oops! That letter is not in my word: {guessed_word}')
             print('-------------')
-        else:
+        else:  # if a letter in secret word
             guessed_word = get_guessed_word(secret_word, letters_guessed)
             print(f'Good guess: {guessed_word}')
             print('-------------')
-            if is_word_guessed(secret_word, letters_guessed):
+            if is_word_guessed(secret_word, letters_guessed):  # if secret word is guessed
                 return True
     interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
-                     available_letters, with_hints)
+                     available_letters, with_hints)  # repeat function
 
 
 def hangman(secret_word):
@@ -194,27 +195,9 @@ def hangman(secret_word):
     secret_word: string, the secret word to guess.
     
     Starts up an interactive game of Hangman.
-    
-    * At the start of the game, let the user know how many 
-      letters the secret_word contains and how many guesses s/he starts with.
-      
-    * The user should start with 6 guesses
-
-    * Before each round, you should display to the user how many guesses
-      s/he has left and the letters that the user has not yet guessed.
-    
-    * Ask the user to supply one guess per round. Remember to make
-      sure that the user puts in a letter!
-    
-    * The user should receive feedback immediately after each guess 
-      about whether their guess appears in the computer's word.
-
-    * After each guess, you should display to the user the 
-      partially guessed word so far.
-    
-    Follows the other limitations detailed in the problem write-up.
     '''
-    warnings_remaining, guesses_remaining = 3, 6
+    warnings_remaining = 3
+    guesses_remaining = 6
     letters_guessed = []
     guessed_word = get_guessed_word(secret_word, letters_guessed)
     available_letters = get_available_letters(letters_guessed)
@@ -242,16 +225,18 @@ def match_with_gaps(my_word, other_word):
         False otherwise:
     '''
     my_word = "".join(list(my_word.split(' ')))
-    if len(my_word) != len(other_word):
+    if len(my_word) != len(other_word):  # compare length
         return False
-    elif '_' in my_word and set(my_word) == set(other_word + '_'):
+    elif '_' in my_word and set(my_word) == set(
+            other_word + '_'):  # compare plurals (if found a different letters - return False)
         return False
     else:
-        length = len(my_word) + 1
+        length = len(my_word)
+        all_letters = list(my_word)
+        all_letters.extend(list(other_word))
         for i in range(length):
-            if my_word[i:i + 1] != other_word[i:i + 1] and my_word[i:i + 1] != '_':
-                if my_word[i:i + 1] != '':
-                    return False
+            if all_letters[i] != all_letters[i + length] and all_letters[i] != '_':
+                return False
     return True
 
 
@@ -277,29 +262,9 @@ def hangman_with_hints(secret_word):
     secret_word: string, the secret word to guess.
     
     Starts up an interactive game of Hangman.
-    
-    * At the start of the game, let the user know how many 
-      letters the secret_word contains and how many guesses s/he starts with.
-      
-    * The user should start with 6 guesses
-    
-    * Before each round, you should display to the user how many guesses
-      s/he has left and the letters that the user has not yet guessed.
-    
-    * Ask the user to supply one guess per round. Make sure to check that the user guesses a letter
-      
-    * The user should receive feedback immediately after each guess
-      about whether their guess appears in the computer's word.
-
-    * After each guess, you should display to the user the 
-      partially guessed word so far.
-      
-    * If the guess is the symbol *, print out all words in wordlist that
-      matches the current guessed word. 
-    
-    Follows the other limitations detailed in the problem write-up.
     '''
-    warnings_remaining, guesses_remaining = 3, 6
+    warnings_remaining = 3
+    guesses_remaining = 6
     letters_guessed = []
     guessed_word = get_guessed_word(secret_word, letters_guessed)
     available_letters = get_available_letters(letters_guessed)
