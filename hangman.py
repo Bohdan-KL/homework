@@ -186,7 +186,7 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
             print('-------------')
             if is_word_guessed(secret_word, letters_guessed):  # if secret word is guessed
                 return True
-    interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
+    return interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
                      available_letters, with_hints)  # repeat function
 
 
@@ -250,11 +250,12 @@ def show_possible_matches(my_word, sourse=wordlist):  # I added here the sourse 
              that has already been revealed.
 
     '''
-    print('Possible word matches are: ', end='')
+    result=''
     for i in sourse:
         if match_with_gaps(my_word, i):
-            print(i, end=' ')
-    print('\n--------')
+            result =result+i+' '
+    print(f'Possible word matches are: {result}')
+    print('-------------')
 
 
 def hangman_with_hints(secret_word):
@@ -275,7 +276,7 @@ def hangman_with_hints(secret_word):
     with_hints = True
     win = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
                            available_letters, with_hints)
-    if win:
+    if win or None:
         print(f'Congratulations, you won! Your total score for this game is: '
               f'{len(secret_word) * guesses_remaining}')
     else:
