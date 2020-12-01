@@ -102,7 +102,8 @@ def get_available_letters(letters_guessed):
 def answer_if_bad(situation, warnings_remaining, guesses_remaining, guessed_word):
     '''
     It's function for checking not normal inputs and printing results.
-    key: View what problem we check. Is not a valid letter(key=1) or user have already guessed that letter(key=2).
+    situation: View what problem we check. Is not a valid letter(situation = 'not_correct') or user have already guessed
+                                                                                    that letter(situation = 'not_new').
     warnings_remaining: how many warnings remaining user have
     guesses_remaining: how many guesses remaining user have
     guessed_word: a guessed word at this moment
@@ -166,7 +167,7 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
     letters_guessed: list (of letters), which letters have been guessed so far
     secret_word: word which computer choose
     available_letters: parameter for inform user how many guesses remaining he has.
-    with_hints: True if user is playing whith hints, else False
+    with_hints: True if user is playing with hints, else False
     '''
     while not is_word_guessed(secret_word, letters_guessed) and guesses_remaining:
         # reed the letter
@@ -207,15 +208,6 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
     return guesses_remaining
 
 
-class games_const(Enum):
-    not_correct = "not_correct"
-    not_new = "not_new"
-    warnings_remaining = 3
-    guesses_remaining = 6
-    vowels = set('aeiou')
-    letters_guessed = set()
-
-
 def hangman(secret_word):
     '''
     secret_word: string, the secret word to guess.
@@ -230,10 +222,15 @@ def hangman(secret_word):
     print("Welcome to the game Hangman!")
     print(f'I am thinking of a word that is {len(secret_word)} letters long.')
     print(f'You have {warnings_remaining} warnings left.')
+    print("Do you want to play with hints?")
+    with_hints = True if input('Write yes if you want, else write anything: ') == 'yes' else False
+    if with_hints:
+        print("You gaming with hints.")
+    else:
+        print("You gaming without hints.")
     print("-------------")
-    with_hints = False
     total = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
-                           available_letters, with_hints)
+                             available_letters, with_hints)
     if total:
         print(f'Congratulations, you won! Your total score for this game is: '
               f'{len(secret_word) * total}')
@@ -251,10 +248,12 @@ def match_with_gaps(my_word, other_word):
         False otherwise:
     '''
     my_word = "".join(list(my_word.split(' ')))
-    if len(my_word) != len(other_word):  # compare length
+    # compare length
+    if len(my_word) != len(other_word):
         return False
+    # compare plurals (if found a different letters - return False)
     elif '_' in my_word and set(my_word) == set(
-            other_word + '_'):  # compare plurals (if found a different letters - return False)
+            other_word + '_'):
         return False
     else:
         length = len(my_word)
@@ -266,7 +265,8 @@ def match_with_gaps(my_word, other_word):
     return True
 
 
-def show_possible_matches(my_word, sourse=wordlist):  # I added here the sourse becouse I don't want to use "global"
+# I added here the sourse becouse I don't want to use "global"
+def show_possible_matches(my_word, sourse=wordlist):
     '''
     my_word: string with _ characters, current guess of secret word
     returns: nothing, but should print out every word in wordlist that matches my_word
@@ -284,31 +284,6 @@ def show_possible_matches(my_word, sourse=wordlist):  # I added here the sourse 
     print('-------------')
 
 
-def hangman_with_hints(secret_word):
-    '''
-    secret_word: string, the secret word to guess.
-    
-    Starts up an interactive game of Hangman.
-    '''
-    warnings_remaining = games_const.warnings_remaining.value
-    guesses_remaining = games_const.guesses_remaining.value
-    letters_guessed = games_const.letters_guessed.value
-    guessed_word = get_guessed_word(secret_word, letters_guessed)
-    available_letters = get_available_letters(letters_guessed)
-    print("Welcome to the game Hangman!")
-    print(f'I am thinking of a word that is {len(secret_word)} letters long.')
-    print(f'You have {warnings_remaining} warnings left.')
-    print("-------------")
-    with_hints = True
-    total = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
-                           available_letters, with_hints)
-    if total or None:
-        print(f'Congratulations, you won! Your total score for this game is: '
-              f'{len(secret_word) * total}')
-    else:
-        print(f'Sorry, you ran out of guesses. The word was {secret_word}')
-
-
 if __name__ == "__main__":
     secret_word = choose_word(wordlist)
-    hangman_with_hints(secret_word)
+    hangman(secret_word)
