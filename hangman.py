@@ -82,10 +82,13 @@ def get_guessed_word(secret_word, letters_guessed):
     returns: string, comprised of letters, underscores (_), and spaces that represents
       which letters in secret_word have been guessed so far.
     '''
-    if secret_word[:1] in letters_guessed:
-        return reduce(lambda x, y: x + y if y in letters_guessed else x + '_ ', secret_word)
-    else:
-        return '_ ' + reduce(lambda x, y: x + y if y in letters_guessed else x + '_ ', secret_word)[1:]
+    result = []
+    for i in secret_word:
+        if i in letters_guessed:
+            result.append(i)
+        else:
+            result.append('_ ')
+    return ''.join(result)
 
 
 def get_available_letters(letters_guessed):
@@ -154,8 +157,7 @@ def inform_and_input(guesses_remaining, available_letters):
     return input('Please guess a letter: ')
 
 
-def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
-                     available_letters, with_hints):
+def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, with_hints):
     '''
     It is the interactive game or main part of hangman function.
     It is a recursive function, which would be run while guesses_remaining is not zero or while
@@ -169,6 +171,8 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
     available_letters: parameter for inform user how many guesses remaining he has.
     with_hints: True if user is playing with hints, else False
     '''
+    guessed_word = get_guessed_word(secret_word, letters_guessed)
+    available_letters = get_available_letters(letters_guessed)
     while not is_word_guessed(secret_word, letters_guessed) and guesses_remaining:
         # reed the letter
         letter = inform_and_input(guesses_remaining, available_letters)
@@ -217,20 +221,17 @@ def hangman(secret_word):
     warnings_remaining = games_const.warnings_remaining.value
     guesses_remaining = games_const.guesses_remaining.value
     letters_guessed = games_const.letters_guessed.value
-    guessed_word = get_guessed_word(secret_word, letters_guessed)
-    available_letters = get_available_letters(letters_guessed)
     print("Welcome to the game Hangman!")
     print(f'I am thinking of a word that is {len(secret_word)} letters long.')
     print(f'You have {warnings_remaining} warnings left.')
     print("Do you want to play with hints?")
     with_hints = True if input('Write yes if you want, else write anything: ') == 'yes' else False
     if with_hints:
-        print("You gaming with hints.")
+        print("You are gaming with hints.")
     else:
-        print("You gaming without hints.")
+        print("You are gaming without hints.")
     print("-------------")
-    total = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
-                             available_letters, with_hints)
+    total = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, with_hints)
     if total:
         print(f'Congratulations, you won! Your total score for this game is: '
               f'{len(secret_word) * total}')
@@ -247,7 +248,7 @@ def match_with_gaps(my_word, other_word):
         _ , and my_word and other_word are of the same length;
         False otherwise:
     '''
-    my_word = "".join(list(my_word.split(' ')))
+    my_word = my_word.replace(' ', '', my_word.count(' '))
     # compare length
     if len(my_word) != len(other_word):
         return False
