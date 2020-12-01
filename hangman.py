@@ -12,6 +12,16 @@ import string
 from functools import reduce
 from enum import Enum
 
+
+class games_const(Enum):
+    not_correct = "not_correct"
+    not_new = "not_new"
+    warnings_remaining = 3
+    guesses_remaining = 6
+    vowels = set('aeiou')
+    letters_guessed = set()
+
+
 WORDLIST_FILENAME = "words.txt"
 
 
@@ -158,41 +168,43 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
     available_letters: parameter for inform user how many guesses remaining he has.
     with_hints: True if user is playing whith hints, else False
     '''
-    if not guesses_remaining:  # check is user lose
-        return False
-    letter = inform_and_input(guesses_remaining, available_letters)  # reed the letter
-    if letter == '*' and with_hints:  # check is user use hint
-        show_possible_matches(guessed_word)
-    elif not str.isalpha(letter):  # chek is user input a correct letter
-        warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(games_const.not_correct.value,
-                                                                            warnings_remaining,
-                                                                            guesses_remaining,
-                                                                            guessed_word)
-    elif str.lower(letter) in letters_guessed:  # check is user input a new letter
-        warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(games_const.not_new.value,
-                                                                            warnings_remaining,
-                                                                            guesses_remaining,
-                                                                            guessed_word)
-    else:  # if a letter is new and not invalid, run this
-        letter = str.lower(letter)
-        letters_guessed.add(letter)
-        available_letters = get_available_letters(letters_guessed)
-
-        if guessed_word == get_guessed_word(secret_word, letters_guessed):  # check is a letter in secret word
-            if letter in games_const.vowels.value:
-                guesses_remaining -= 2
+    while not is_word_guessed(secret_word, letters_guessed) and guesses_remaining:
+        # reed the letter
+        letter = inform_and_input(guesses_remaining, available_letters)
+        # check is user use hint
+        if letter == '*' and with_hints:
+            show_possible_matches(guessed_word)
+        # chek is user input a correct letter
+        elif not str.isalpha(letter):
+            warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(games_const.not_correct.value,
+                                                                                warnings_remaining,
+                                                                                guesses_remaining,
+                                                                                guessed_word)
+        # check is user input a new letter
+        elif str.lower(letter) in letters_guessed:
+            warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(games_const.not_new.value,
+                                                                                warnings_remaining,
+                                                                                guesses_remaining,
+                                                                                guessed_word)
+        # if a letter is new and not invalid, run this
+        else:
+            letter = str.lower(letter)
+            letters_guessed.add(letter)
+            available_letters = get_available_letters(letters_guessed)
+            # check is a letter in secret word
+            if guessed_word == get_guessed_word(secret_word, letters_guessed):
+                if letter in games_const.vowels.value:
+                    guesses_remaining -= 2
+                else:
+                    guesses_remaining -= 1
+                print(f'Oops! That letter is not in my word: {guessed_word}')
+                print('-------------')
+            # if a letter in secret word
             else:
-                guesses_remaining -= 1
-            print(f'Oops! That letter is not in my word: {guessed_word}')
-            print('-------------')
-        else:  # if a letter in secret word
-            guessed_word = get_guessed_word(secret_word, letters_guessed)
-            print(f'Good guess: {guessed_word}')
-            print('-------------')
-            if is_word_guessed(secret_word, letters_guessed):  # if secret word is guessed
-                return True
-    return interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
-                            available_letters, with_hints)  # repeat function
+                guessed_word = get_guessed_word(secret_word, letters_guessed)
+                print(f'Good guess: {guessed_word}')
+                print('-------------')
+    return guesses_remaining
 
 
 class games_const(Enum):
@@ -220,11 +232,11 @@ def hangman(secret_word):
     print(f'You have {warnings_remaining} warnings left.')
     print("-------------")
     with_hints = False
-    win = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
+    total = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
                            available_letters, with_hints)
-    if win:
+    if total:
         print(f'Congratulations, you won! Your total score for this game is: '
-              f'{len(secret_word) * guesses_remaining}')
+              f'{len(secret_word) * total}')
     else:
         print(f'Sorry, you ran out of guesses. The word was {secret_word}')
 
@@ -288,11 +300,11 @@ def hangman_with_hints(secret_word):
     print(f'You have {warnings_remaining} warnings left.')
     print("-------------")
     with_hints = True
-    win = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
+    total = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
                            available_letters, with_hints)
-    if win or None:
+    if total or None:
         print(f'Congratulations, you won! Your total score for this game is: '
-              f'{len(secret_word) * guesses_remaining}')
+              f'{len(secret_word) * total}')
     else:
         print(f'Sorry, you ran out of guesses. The word was {secret_word}')
 
