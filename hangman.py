@@ -173,7 +173,7 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
     '''
     guessed_word = get_guessed_word(secret_word, letters_guessed)
     available_letters = get_available_letters(letters_guessed)
-    while not is_word_guessed(secret_word, letters_guessed) and guesses_remaining:
+    while not is_word_guessed(secret_word, letters_guessed) and guesses_remaining > 0:
         # reed the letter
         letter = inform_and_input(guesses_remaining, available_letters)
         # check is user use hint
@@ -197,7 +197,7 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
             letters_guessed.add(letter)
             available_letters = get_available_letters(letters_guessed)
             # check is a letter in secret word
-            if guessed_word == get_guessed_word(secret_word, letters_guessed):
+            if letter not in secret_word:
                 if letter in games_const.vowels.value:
                     guesses_remaining -= 2
                 else:
@@ -232,7 +232,7 @@ def hangman(secret_word):
         print("You are gaming without hints.")
     print("-------------")
     total = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, with_hints)
-    if total:
+    if total > 0:
         print(f'Congratulations, you won! Your total score for this game is: '
               f'{len(secret_word) * total}')
     else:
@@ -257,11 +257,8 @@ def match_with_gaps(my_word, other_word):
             other_word + '_'):
         return False
     else:
-        length = len(my_word)
-        all_letters = list(my_word)
-        all_letters.extend(list(other_word))
-        for i in range(length):
-            if all_letters[i] != all_letters[i + length] and all_letters[i] != '_':
+        for my, other in zip(my_word, other_word):
+            if my != other and my != '_':
                 return False
     return True
 
@@ -277,10 +274,11 @@ def show_possible_matches(my_word, sourse=wordlist):
              that has already been revealed.
 
     '''
-    result = ''
+    result = []
     for i in sourse:
         if match_with_gaps(my_word, i):
-            result = result + i + ' '
+            result.append(i)
+    result = ' '.join(result)
     print(f'Possible word matches are: {result}')
     print('-------------')
 
