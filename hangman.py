@@ -10,6 +10,7 @@
 import random
 import string
 from functools import reduce
+from enum import Enum
 
 WORDLIST_FILENAME = "words.txt"
 
@@ -61,7 +62,7 @@ def is_word_guessed(secret_word, letters_guessed):
     Discrete Math is the best.
     '''
     secret_word_set = set(secret_word)
-    return set(letters_guessed).intersection(secret_word_set) == secret_word_set
+    return letters_guessed.intersection(secret_word_set) == secret_word_set
 
 
 def get_guessed_word(secret_word, letters_guessed):
@@ -88,7 +89,7 @@ def get_available_letters(letters_guessed):
     return "".join(filter(lambda x: x not in letters_guessed, all_letters))
 
 
-def answer_if_bad(key, warnings_remaining, guesses_remaining, guessed_word):
+def answer_if_bad(situation, warnings_remaining, guesses_remaining, guessed_word):
     '''
     It's function for checking not normal inputs and printing results.
     key: View what problem we check. Is not a valid letter(key=1) or user have already guessed that letter(key=2).
@@ -98,7 +99,7 @@ def answer_if_bad(key, warnings_remaining, guesses_remaining, guessed_word):
 
     return: changed warnings_remaining, guesses_remaining, guessed_word
     '''
-    if key == 1:
+    if situation == 'not_correct':
         if warnings_remaining != 0:
             warnings_remaining -= 1
             print(f'Oops! That is not a valid letter. You have {warnings_remaining} '
@@ -110,7 +111,7 @@ def answer_if_bad(key, warnings_remaining, guesses_remaining, guessed_word):
                 f'Oops! That is not a valid letter. You have no warnings left so you '
                 f'lose one guess: {guessed_word}')
             print('-------------')
-    else:
+    elif situation == 'not_new':
         if warnings_remaining != 0:
             warnings_remaining -= 1
             print(
@@ -163,18 +164,22 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
     if letter == '*' and with_hints:  # check is user use hint
         show_possible_matches(guessed_word)
     elif not str.isalpha(letter):  # chek is user input a correct letter
-        warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(1, warnings_remaining, guesses_remaining,
+        warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(games_const.not_correct.value,
+                                                                            warnings_remaining,
+                                                                            guesses_remaining,
                                                                             guessed_word)
     elif str.lower(letter) in letters_guessed:  # check is user input a new letter
-        warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(2, warnings_remaining, guesses_remaining,
+        warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(games_const.not_new.value,
+                                                                            warnings_remaining,
+                                                                            guesses_remaining,
                                                                             guessed_word)
     else:  # if a letter is new and not invalid, run this
         letter = str.lower(letter)
-        letters_guessed.append(letter)
+        letters_guessed.add(letter)
         available_letters = get_available_letters(letters_guessed)
 
         if guessed_word == get_guessed_word(secret_word, letters_guessed):  # check is a letter in secret word
-            if letter in 'aeiou':
+            if letter in games_const.vowels.value:
                 guesses_remaining -= 2
             else:
                 guesses_remaining -= 1
@@ -187,7 +192,16 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
             if is_word_guessed(secret_word, letters_guessed):  # if secret word is guessed
                 return True
     return interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, guessed_word,
-                     available_letters, with_hints)  # repeat function
+                            available_letters, with_hints)  # repeat function
+
+
+class games_const(Enum):
+    not_correct = "not_correct"
+    not_new = "not_new"
+    warnings_remaining = 3
+    guesses_remaining = 6
+    vowels = set('aeiou')
+    letters_guessed = set()
 
 
 def hangman(secret_word):
@@ -196,9 +210,9 @@ def hangman(secret_word):
     
     Starts up an interactive game of Hangman.
     '''
-    warnings_remaining = 3
-    guesses_remaining = 6
-    letters_guessed = []
+    warnings_remaining = games_const.warnings_remaining.value
+    guesses_remaining = games_const.guesses_remaining.value
+    letters_guessed = games_const.letters_guessed.value
     guessed_word = get_guessed_word(secret_word, letters_guessed)
     available_letters = get_available_letters(letters_guessed)
     print("Welcome to the game Hangman!")
@@ -250,10 +264,10 @@ def show_possible_matches(my_word, sourse=wordlist):  # I added here the sourse 
              that has already been revealed.
 
     '''
-    result=''
+    result = ''
     for i in sourse:
         if match_with_gaps(my_word, i):
-            result =result+i+' '
+            result = result + i + ' '
     print(f'Possible word matches are: {result}')
     print('-------------')
 
@@ -264,9 +278,9 @@ def hangman_with_hints(secret_word):
     
     Starts up an interactive game of Hangman.
     '''
-    warnings_remaining = 3
-    guesses_remaining = 6
-    letters_guessed = []
+    warnings_remaining = games_const.warnings_remaining.value
+    guesses_remaining = games_const.guesses_remaining.value
+    letters_guessed = games_const.letters_guessed.value
     guessed_word = get_guessed_word(secret_word, letters_guessed)
     available_letters = get_available_letters(letters_guessed)
     print("Welcome to the game Hangman!")
