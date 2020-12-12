@@ -11,17 +11,36 @@ import random
 import string
 from enum import Enum
 
-
-class games_const(Enum):
-    not_correct = "not_correct"
-    not_new = "not_new"
-    warnings_remaining = 3
-    guesses_remaining = 6
-    vowels = set('aeiou')
-    letters_guessed = set()
-
-
 WORDLIST_FILENAME = "words.txt"
+
+NOT_CORRECT = "not_correct"
+NOT_NEW = "not_new"
+WARNIGS_REMAINING = 3
+GUESSES_REMAINING = 6
+VOWELS = set('aeiou')
+LETTERS_GUESSED = set()
+
+
+class GamesSituation(Enum):
+    NOT_CORRECT = 1
+    NOT_NEW = 2
+
+
+class GamesConst(Enum):
+    W_REMAINING = 3
+    G_REMAINING = 4
+    VOWELS = 5
+    LETTERS_GUESSED = 6
+
+
+Dict_consts = {
+    GamesSituation.NOT_CORRECT: "not_correct",
+    GamesSituation.NOT_NEW: "not_new",
+    GamesConst.W_REMAINING: 3,
+    GamesConst.G_REMAINING: 6,
+    GamesConst.VOWELS: set('aeiou'),
+    GamesConst.LETTERS_GUESSED: set()
+}
 
 
 def load_words():
@@ -171,7 +190,6 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
     return: guesses_remaining
     '''
     guessed_word = get_guessed_word(secret_word, letters_guessed)
-    available_letters = get_available_letters(letters_guessed)
     while not is_word_guessed(secret_word, letters_guessed) and guesses_remaining > 0:
         # reed the letter
         available_letters = get_available_letters(letters_guessed)
@@ -181,19 +199,19 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
             show_possible_matches(guessed_word)
         # chek is user input a correct letter
         elif not str.isalpha(letter):
-            warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(games_const.not_correct.value,
+            warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(Dict_consts[GamesSituation.NOT_CORRECT],
                                                                                 warnings_remaining, guesses_remaining,
                                                                                 guessed_word)
         # check is user input a new letter
         elif str.lower(letter) in letters_guessed:
-            warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(games_const.not_new.value,
+            warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(Dict_consts[GamesSituation.NOT_NEW],
                                                                                 warnings_remaining, guesses_remaining,
                                                                                 guessed_word)
         # if a letter is new and not invalid, run actions_if_new_letter function
         else:
             letters_guessed, guesses_remaining, guessed_word = actions_if_new_letter(letter, letters_guessed,
-                                                                                 guesses_remaining, guessed_word,
-                                                                                 secret_word)
+                                                                                     guesses_remaining, guessed_word,
+                                                                                     secret_word)
     return guesses_remaining
 
 
@@ -212,7 +230,7 @@ def actions_if_new_letter(letter, letters_guessed, guesses_remaining, guessed_wo
     letters_guessed.add(letter)
     # check is a letter in secret word
     if letter not in secret_word:
-        if letter in games_const.vowels.value:
+        if letter in Dict_consts[GamesConst.VOWELS]:
             guesses_remaining -= 2
         else:
             guesses_remaining -= 1
@@ -232,9 +250,9 @@ def hangman(secret_word):
     
     Starts up an interactive game of Hangman.
     '''
-    warnings_remaining = games_const.warnings_remaining.value
-    guesses_remaining = games_const.guesses_remaining.value
-    letters_guessed = games_const.letters_guessed.value
+    warnings_remaining = Dict_consts[GamesConst.W_REMAINING]
+    guesses_remaining = Dict_consts[GamesConst.G_REMAINING]
+    letters_guessed = Dict_consts[GamesConst.LETTERS_GUESSED]
     print("Welcome to the game Hangman!")
     print(f'I am thinking of a word that is {len(secret_word)} letters long.')
     print(f'You have {warnings_remaining} warnings left.')
@@ -299,7 +317,7 @@ def show_possible_matches(my_word, sourse=wordlist):
         if match_with_gaps(my_word, i):
             result.append(i)
     result = ' '.join(result)
-    if len(result):
+    if len(result) > 0:
         print(f'Possible word matches are: {result}')
     else:
         print('There no one possible word matches.')
