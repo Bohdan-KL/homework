@@ -97,8 +97,7 @@ def get_available_letters(letters_guessed):
       yet been guessed.
       Filter is removing false letters.
     '''
-    all_letters = string.ascii_lowercase
-    return "".join(filter(lambda x: x not in letters_guessed, all_letters))
+    return "".join(filter(lambda x: x not in letters_guessed, string.ascii_lowercase))
 
 
 def answer_if_bad(situation, warnings_remaining, guesses_remaining, guessed_word):
@@ -150,7 +149,6 @@ def inform_and_input(guesses_remaining, available_letters):
     interactive_game should be small. This function made for making
     interactive_game function smaller and more easy to understand.
     '''
-
     print(f'You have {guesses_remaining} guesses left.')
     print(f'Available letters: {available_letters}')
     return input('Please guess a letter: ')
@@ -176,6 +174,7 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
     available_letters = get_available_letters(letters_guessed)
     while not is_word_guessed(secret_word, letters_guessed) and guesses_remaining > 0:
         # reed the letter
+        available_letters = get_available_letters(letters_guessed)
         letter = inform_and_input(guesses_remaining, available_letters)
         # check is user use hint
         if letter == '*' and with_hints:
@@ -192,9 +191,9 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
                                                                                 guessed_word)
         # if a letter is new and not invalid, run actions_if_new_letter function
         else:
-            available_letters = get_available_letters(letters_guessed)
             letters_guessed, guesses_remaining, guessed_word = actions_if_new_letter(letter, letters_guessed,
-                                                                        guesses_remaining, guessed_word, secret_word)
+                                                                                 guesses_remaining, guessed_word,
+                                                                                 secret_word)
     return guesses_remaining
 
 
@@ -268,13 +267,18 @@ def match_with_gaps(my_word, other_word):
     if len(my_word) - my_word.count(' ') != len(other_word):
         return False
     # compare plurals (if found a different letters - return False)
-    # elif '_' in my_word and set(my_word) == set(
-    #        other_word + '_'):
-    #    return False
-    else:
+    elif '_' in my_word:
+        set_my_word = set(my_word)
+        set_other_word = set(other_word + '_ ')
+        if set_my_word == set_other_word and len(set_other_word) - 2 != len(other_word):
+            return False
+        elif set_my_word == set_other_word:
+            return False
         my_word = my_word.replace(' ', '', my_word.count(' '))
         for my, other in zip(my_word, other_word):
             if my != other and my != '_':
+                return False
+            elif other_word.count(my) > 1:
                 return False
     return True
 
@@ -304,4 +308,4 @@ def show_possible_matches(my_word, sourse=wordlist):
 
 if __name__ == "__main__":
     secret_word = choose_word(wordlist)
-    hangman('daqwy')  # secret_word)
+    hangman(secret_word)
