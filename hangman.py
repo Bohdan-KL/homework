@@ -229,7 +229,7 @@ def actions_if_new_letter(letter, letters_guessed, guesses_remaining, guessed_wo
     letters_guessed.add(letter)
     # check is a letter in secret word
     if letter not in secret_word:
-        if letter in Dict_consts[GamesConst.VOWELS]:
+        if letter in VOWELS:
             guesses_remaining -= 2
         else:
             guesses_remaining -= 1
