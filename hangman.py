@@ -225,7 +225,7 @@ def actions_if_new_letter(letter, letters_guessed, guesses_remaining, guessed_wo
 
     return: changed letters_guessed, guesses_remaining, guessed_word
     '''
-    letter = str.lower(letter)
+    letter = letter.lower()
     letters_guessed.add(letter)
     # check is a letter in secret word
     if letter not in secret_word:
