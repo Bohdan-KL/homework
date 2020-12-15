@@ -130,7 +130,7 @@ def answer_if_bad(situation, warnings_remaining, guesses_remaining, guessed_word
 
     return: changed warnings_remaining, guesses_remaining, guessed_word
     '''
-    if situation == 'not_correct':
+    if situation == GamesSituation.NOT_CORRECT:
         if warnings_remaining != 0:
             warnings_remaining -= 1
             print(f'Oops! That is not a valid letter. You have {warnings_remaining} '
