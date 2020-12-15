@@ -199,9 +199,8 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
             show_possible_matches(guessed_word)
         # chek is user input a correct letter
         elif not str.isalpha(letter):
-            warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(Dict_consts[GamesSituation.NOT_CORRECT],
-                                                                                warnings_remaining, guesses_remaining,
-                                                                                guessed_word)
+            warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(
+                GamesSituation.NOT_CORRECT, warnings_remaining, guesses_remaining, guessed_word)
         # check is user input a new letter
         elif str.lower(letter) in letters_guessed:
             warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(Dict_consts[GamesSituation.NOT_NEW],
