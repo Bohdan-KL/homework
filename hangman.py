@@ -16,8 +16,8 @@ WORDLIST_FILENAME = "words.txt"
 NOT_CORRECT = "not_correct"
 NOT_NEW = "not_new"
 UNKNOW_LETTER = '_'
-WARNIGS_REMAINING = 3
-GUESSES_REMAINING = 6
+INITIAL_WARNIGS = 3
+INITIAL_GUESSES = 6
 HINTS = "*"
 VOWELS = set('aeiou')
 
@@ -25,13 +25,8 @@ VOWELS = set('aeiou')
 class ValidationResultType(Enum):
     NOT_CORRECT = 1
     NOT_NEW = 2
-
-
-class GamesConst(Enum):
-    W_REMAINING = 3
-    G_REMAINING = 4
-    VOWELS = 5
-    LETTERS_GUESSED = 6
+    WITH_HINTS = 3
+    WITHOUT_HINTS = 4
 
 
 def load_words():
@@ -240,26 +235,53 @@ def hangman(secret_word):
     
     Starts up an interactive game of Hangman.
     '''
-    warnings_remaining = WARNIGS_REMAINING
-    guesses_remaining = GUESSES_REMAINING
+    warnings_remaining = INITIAL_WARNIGS
+    guesses_remaining = INITIAL_GUESSES
     letters_guessed = set()
     print("Welcome to the game Hangman!")
     print(f'I am thinking of a word that is {len(secret_word)} letters long.')
     print(f'You have {warnings_remaining} warnings left.')
-    print("Do you want to play with hints?")
-    with_hints = True if input('Write yes if you want, else write anything: ') == 'yes' else False
-    if with_hints:
+    with_hints = is_with_hints()
+    if with_hints == ValidationResultType.WITH_HINTS:
         print("You are gaming with hints.")
+        print("-------------")
+        # total is a variable about how many points of game user have. if 0 - user lose, else - win
+        total_points = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, True)
     else:
         print("You are gaming without hints.")
-    print("-------------")
-    # total is a variable about how many points of game user have. if 0 - user lose, else - win
-    total_points = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, with_hints)
+        print("-------------")
+        # total is a variable about how many points of game user have. if 0 - user lose, else - win
+        total_points = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, False)
     if total_points > 0:
         print(f'Congratulations, you won! Your total score for this game is: '
               f'{len(secret_word) * total_points}')
     else:
         print(f'Sorry, you ran out of guesses. The word was {secret_word}')
+
+
+def is_with_hints():
+    '''
+    Function for checking valid input. Is game with hints or is without hints.
+
+    Return
+    3 if 'yes' in reaction, else 4
+    '''
+    print("Do you want to play with hints?")
+    reaction = input('Write yes if you want, else write no: ')
+    if 'yes' not in reaction and 'no' not in reaction:
+        while True:
+            print("-------------")
+            print('Please, write yes or no')
+            reaction = input('Write yes if you want, else write no: ')
+            if 'yes' in reaction:
+                return ValidationResultType.WITH_HINTS
+            elif 'no' in reaction:
+                return ValidationResultType.WITHOUT_HINTS
+    else:
+        if 'yes' in reaction:
+            return ValidationResultType.WITH_HINTS
+        elif 'no' in reaction:
+            return ValidationResultType.WITHOUT_HINTS
 
 
 def match_with_gaps(my_word, other_word):
@@ -280,13 +302,12 @@ def match_with_gaps(my_word, other_word):
         return False
     # compare plurals (if found a different letters - return False)
     elif UNKNOW_LETTER in my_word:
+        # making two sets. If intersections another - False
         set_my_word = set(my_word)
         set_other_word = set(other_word + UNKNOW_LETTER)
         if set_other_word.intersection(set_my_word) != set_my_word:
             return False
-
-        #lif len(other_word) - len(set_other_word) != len(my_word) - len(set_my_word):
-        #    return False
+        # here making checking for all letters
         for my, other in zip(my_word, other_word):
             if my != UNKNOW_LETTER:
                 if my != other:
