@@ -15,13 +15,14 @@ WORDLIST_FILENAME = "words.txt"
 
 NOT_CORRECT = "not_correct"
 NOT_NEW = "not_new"
+UNKNOW_LETTER = '_'
 WARNIGS_REMAINING = 3
 GUESSES_REMAINING = 6
+HINTS = "*"
 VOWELS = set('aeiou')
-LETTERS_GUESSED = set()
 
 
-class GamesSituation(Enum):
+class ValidationResultType(Enum):
     NOT_CORRECT = 1
     NOT_NEW = 2
 
@@ -31,16 +32,6 @@ class GamesConst(Enum):
     G_REMAINING = 4
     VOWELS = 5
     LETTERS_GUESSED = 6
-
-
-Dict_consts = {
-    GamesSituation.NOT_CORRECT: "not_correct",
-    GamesSituation.NOT_NEW: "not_new",
-    GamesConst.W_REMAINING: 3,
-    GamesConst.G_REMAINING: 6,
-    GamesConst.VOWELS: set('aeiou'),
-    GamesConst.LETTERS_GUESSED: set()
-}
 
 
 def load_words():
@@ -130,7 +121,7 @@ def answer_if_bad(situation, warnings_remaining, guesses_remaining, guessed_word
 
     return: changed warnings_remaining, guesses_remaining, guessed_word
     '''
-    if situation == GamesSituation.NOT_CORRECT:
+    if situation == ValidationResultType.NOT_CORRECT:
         if warnings_remaining != 0:
             warnings_remaining -= 1
             print(f'Oops! That is not a valid letter. You have {warnings_remaining} '
@@ -142,7 +133,7 @@ def answer_if_bad(situation, warnings_remaining, guesses_remaining, guessed_word
                 f'Oops! That is not a valid letter. You have no warnings left so you '
                 f'lose one guess: {guessed_word}')
             print('-------------')
-    elif situation == 'not_new':
+    elif situation == ValidationResultType.NOT_NEW:
         if warnings_remaining != 0:
             warnings_remaining -= 1
             print(
@@ -195,15 +186,15 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
         available_letters = get_available_letters(letters_guessed)
         letter = inform_and_input(guesses_remaining, available_letters)
         # check is user use hint
-        if letter == '*' and with_hints:
+        if letter == HINTS and with_hints:
             show_possible_matches(guessed_word)
         # chek is user input a correct letter
         elif not str.isalpha(letter):
             warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(
-                GamesSituation.NOT_CORRECT, warnings_remaining, guesses_remaining, guessed_word)
+                ValidationResultType.NOT_CORRECT, warnings_remaining, guesses_remaining, guessed_word)
         # check is user input a new letter
         elif str.lower(letter) in letters_guessed:
-            warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(Dict_consts[GamesSituation.NOT_NEW],
+            warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(ValidationResultType.NOT_NEW,
                                                                                 warnings_remaining, guesses_remaining,
                                                                                 guessed_word)
         # if a letter is new and not invalid, run actions_if_new_letter function
@@ -249,9 +240,9 @@ def hangman(secret_word):
     
     Starts up an interactive game of Hangman.
     '''
-    warnings_remaining = Dict_consts[GamesConst.W_REMAINING]
-    guesses_remaining = Dict_consts[GamesConst.G_REMAINING]
-    letters_guessed = Dict_consts[GamesConst.LETTERS_GUESSED]
+    warnings_remaining = WARNIGS_REMAINING
+    guesses_remaining = GUESSES_REMAINING
+    letters_guessed = set()
     print("Welcome to the game Hangman!")
     print(f'I am thinking of a word that is {len(secret_word)} letters long.')
     print(f'You have {warnings_remaining} warnings left.')
@@ -281,22 +272,27 @@ def match_with_gaps(my_word, other_word):
         False otherwise:
     '''
     # compare length
-    if len(my_word) - my_word.count(' ') != len(other_word):
+    my_word = list(my_word)
+    while ' ' in my_word:
+        my_word.remove(' ')
+    # print(len(my_word),len(other_word))
+    if len(my_word) != len(other_word):
         return False
     # compare plurals (if found a different letters - return False)
-    elif '_' in my_word:
+    elif UNKNOW_LETTER in my_word:
         set_my_word = set(my_word)
-        set_other_word = set(other_word + '_ ')
-        if set_my_word == set_other_word and len(set_other_word) - 2 != len(other_word):
+        set_other_word = set(other_word + UNKNOW_LETTER)
+        if set_other_word.intersection(set_my_word) != set_my_word:
             return False
-        elif set_my_word == set_other_word:
-            return False
-        my_word = my_word.replace(' ', '', my_word.count(' '))
+
+        #lif len(other_word) - len(set_other_word) != len(my_word) - len(set_my_word):
+        #    return False
         for my, other in zip(my_word, other_word):
-            if my != other and my != '_':
-                return False
-            elif other_word.count(my) > 1:
-                return False
+            if my != UNKNOW_LETTER:
+                if my != other:
+                    return False
+                elif other_word.count(my) != my_word.count(my):
+                    return False
     return True
 
 
