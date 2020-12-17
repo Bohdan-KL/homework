@@ -14,6 +14,7 @@ from enum import Enum
 WORDLIST_FILENAME = "words.txt"
 
 UNKNOW_LETTER = '_'
+UNKNOW_LETTER_WITH_SPACE = '_ '
 INITIAL_WARNIGS = 3
 INITIAL_GUESSES = 6
 HINTS = "*"
@@ -89,7 +90,7 @@ def get_guessed_word(secret_word, letters_guessed):
         if i in letters_guessed:
             result.append(i)
         else:
-            result.append('_ ')
+            result.append(UNKNOW_LETTER_WITH_SPACE)
     return ''.join(result)
 
 
@@ -294,17 +295,13 @@ def match_with_gaps(my_word, other_word):
     # compare length
     if len(my_word) != len(other_word):
         return False
-    # compare plurals (if found a different letters - return False)
-    elif UNKNOW_LETTER in my_word:
-        # here making checking for all letters
-        for my, other in zip(my_word, other_word):
-            if my != UNKNOW_LETTER:
-                if my != other:
-                    return False
-                elif other_word.count(my) != my_word.count(my):
-                    return False
-    else:
-        return True
+    # compare plurals (if found a different letters - return False). Here making checking for all letters
+    for my, other in zip(my_word, other_word):
+        if my != UNKNOW_LETTER:
+            if my != other:
+                return False
+            elif other_word.count(my) != my_word.count(my):
+                return False
     return True
 
 
@@ -318,9 +315,8 @@ def show_possible_matches(my_word):
              that has already been revealed.
 
     '''
-    global wordlist
     result = []
-    my_word = list(my_word.replace(' ', '', my_word.count(' ')))
+    my_word = my_word.replace(' ', '')
     for word in wordlist:
         if match_with_gaps(my_word, word):
             result.append(word)
