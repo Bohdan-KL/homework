@@ -13,8 +13,6 @@ from enum import Enum
 
 WORDLIST_FILENAME = "words.txt"
 
-NOT_CORRECT = "not_correct"
-NOT_NEW = "not_new"
 UNKNOW_LETTER = '_'
 INITIAL_WARNIGS = 3
 INITIAL_GUESSES = 6
@@ -294,19 +292,10 @@ def match_with_gaps(my_word, other_word):
         False otherwise:
     '''
     # compare length
-    my_word = list(my_word)
-    while ' ' in my_word:
-        my_word.remove(' ')
-    # print(len(my_word),len(other_word))
     if len(my_word) != len(other_word):
         return False
     # compare plurals (if found a different letters - return False)
     elif UNKNOW_LETTER in my_word:
-        # making two sets. If intersections another - False
-        set_my_word = set(my_word)
-        set_other_word = set(other_word + UNKNOW_LETTER)
-        if set_other_word.intersection(set_my_word) != set_my_word:
-            return False
         # here making checking for all letters
         for my, other in zip(my_word, other_word):
             if my != UNKNOW_LETTER:
@@ -314,11 +303,12 @@ def match_with_gaps(my_word, other_word):
                     return False
                 elif other_word.count(my) != my_word.count(my):
                     return False
+    else:
+        return True
     return True
 
 
-# I added here the sourse becouse I don't want to use "global"
-def show_possible_matches(my_word, sourse=wordlist):
+def show_possible_matches(my_word):
     '''
     my_word: string with _ characters, current guess of secret word
     returns: nothing, but should print out every word in wordlist that matches my_word
@@ -328,10 +318,12 @@ def show_possible_matches(my_word, sourse=wordlist):
              that has already been revealed.
 
     '''
+    global wordlist
     result = []
-    for i in sourse:
-        if match_with_gaps(my_word, i):
-            result.append(i)
+    my_word = list(my_word.replace(' ', '', my_word.count(' ')))
+    for word in wordlist:
+        if match_with_gaps(my_word, word):
+            result.append(word)
     result = ' '.join(result)
     if len(result) > 0:
         print(f'Possible word matches are: {result}')
