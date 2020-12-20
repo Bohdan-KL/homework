@@ -14,7 +14,6 @@ from enum import Enum
 WORDLIST_FILENAME = "words.txt"
 
 UNKNOW_LETTER = '_'
-UNKNOW_LETTER_WITH_SPACE = '_ '
 INITIAL_WARNIGS = 3
 INITIAL_GUESSES = 6
 HINTS = "*"
@@ -90,7 +89,7 @@ def get_guessed_word(secret_word, letters_guessed):
         if i in letters_guessed:
             result.append(i)
         else:
-            result.append(UNKNOW_LETTER_WITH_SPACE)
+            result.append(UNKNOW_LETTER + " ")
     return ''.join(result)
 
 
@@ -263,7 +262,7 @@ def is_with_hints():
     Function for checking valid input. Is game with hints or is without hints.
 
     Return
-    3 if 'yes' in reaction, else 4
+    ValidationResultType.WITH_HINTS if 'yes' in reaction, else ValidationResultType.WITHOUT_HINTS
     '''
     print("Do you want to play with hints?")
     reaction = input('Write yes if you want, else write no: ')
