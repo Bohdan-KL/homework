@@ -154,7 +154,12 @@ def inform_and_input(guesses_remaining, available_letters):
     '''
     print(f'You have {guesses_remaining} guesses left.')
     print(f'Available letters: {available_letters}')
-    return input('Please guess a letter: ')
+    letter = input('Please guess a letter: ')
+    if len(letter) != 1:
+        while len(letter) > 1:
+            print('Please, write one letter and nothing more!')
+            letter = input('Please guess a letter: ')
+    return letter
 
 
 def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, with_hints):
@@ -252,7 +257,7 @@ def hangman(secret_word):
         total_points = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, False)
     if total_points > 0:
         print(f'Congratulations, you won! Your total score for this game is: '
-              f'{len(secret_word) * total_points}')
+              f'{len(set(secret_word)) * total_points}')
     else:
         print(f'Sorry, you ran out of guesses. The word was {secret_word}')
 
@@ -329,4 +334,4 @@ def show_possible_matches(my_word):
 
 if __name__ == "__main__":
     secret_word = choose_word(wordlist)
-    hangman(secret_word)
+    hangman('apple')#secret_word)
