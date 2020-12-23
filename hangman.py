@@ -18,7 +18,7 @@ INITIAL_WARNIGS = 3
 INITIAL_GUESSES = 6
 HINTS = "*"
 VOWELS = set('aeiou')
-
+VALID_LETTER = 'qwertyuiopasdfghjklzxcvbnm'
 
 class ValidationResultType(Enum):
     NOT_CORRECT = 1
@@ -154,12 +154,8 @@ def inform_and_input(guesses_remaining, available_letters):
     '''
     print(f'You have {guesses_remaining} guesses left.')
     print(f'Available letters: {available_letters}')
-    letter = input('Please guess a letter: ')
-    if len(letter) != 1:
-        while len(letter) > 1:
-            print('Please, write one letter and nothing more!')
-            letter = input('Please guess a letter: ')
-    return letter
+    letter = input('Please guess a letter: ').replace(' ', '')
+    return letter.lower()
 
 
 def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, with_hints):
@@ -187,11 +183,11 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
         if letter == HINTS and with_hints:
             show_possible_matches(guessed_word)
         # chek is user input a correct letter
-        elif not str.isalpha(letter):
+        elif letter not in VALID_LETTER or len(letter) != 1:
             warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(
                 ValidationResultType.NOT_CORRECT, warnings_remaining, guesses_remaining, guessed_word)
         # check is user input a new letter
-        elif str.lower(letter) in letters_guessed:
+        elif letter in letters_guessed:
             warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(ValidationResultType.NOT_NEW,
                                                                                 warnings_remaining, guesses_remaining,
                                                                                 guessed_word)
@@ -334,4 +330,4 @@ def show_possible_matches(my_word):
 
 if __name__ == "__main__":
     secret_word = choose_word(wordlist)
-    hangman('apple')#secret_word)
+    hangman(secret_word)
