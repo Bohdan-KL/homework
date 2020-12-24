@@ -18,6 +18,7 @@ CONSONANTS = 'bcdfghjklmnpqrstvwxyz'
 ALL_LETTERS = VOWELS + CONSONANTS
 HAND_SIZE = 7
 WILDCARD = '*'
+GAME_OVER = '!!'
 
 SCRABBLE_LETTER_VALUES = {
     'a': 1, 'b': 3, 'c': 3, 'd': 2, 'e': 1, 'f': 4, 'g': 2, 'h': 4, 'i': 1, 'j': 8, 'k': 5, 'l': 1, 'm': 3, 'n': 1,
@@ -203,7 +204,7 @@ def play_hand(hand, word_list):
     while hand:
         print(display_hand(hand))
         word = input('Enter word, or “!!” to indicate that you are finished: ')
-        if '!!' in word:
+        if GAME_OVER == word:
             break
         else:
             if is_valid_word(word, hand, word_list):
@@ -215,7 +216,7 @@ def play_hand(hand, word_list):
             print()
         hand = update_hand(hand, word)
     # Game is over (user entered '!!' or ran out of letters),
-    if '!!' in word:
+    if GAME_OVER == word:
         print(f'Total score for this hand: {total}')
     else:
         print('Ran out of letters')
@@ -233,12 +234,8 @@ def substitute_hand(hand, letter):
     returns: dictionary (string -> int) or string(if all letters in hand)
     """
     all_hands_letters = hand.keys()
-    if letter not in all_hands_letters:
+    if letter not in all_hands_letters or set(all_hands_letters).intersection(set(VOWELS)) == set(VOWELS):
         return hand
-    elif len(all_hands_letters) == 27 and '*' in all_hands_letters:
-        return 'Cannot be replaced, all letters are here.'
-    elif len(all_hands_letters) == 26 and '*' not in all_hands_letters:
-        return 'Cannot be replaced, all letters are here.'
     random_letter = random.choice(ALL_LETTERS)
     while random_letter in all_hands_letters:
         random_letter = random.choice(ALL_LETTERS)
