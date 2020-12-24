@@ -10,15 +10,18 @@
 import math
 import random
 from collections import Counter
+import re
 
 VOWELS = 'aeiou'
+VOWELS_PATTERN = "['a','e','i','o','u']"
 CONSONANTS = 'bcdfghjklmnpqrstvwxyz'
 ALL_LETTERS = VOWELS + CONSONANTS
 HAND_SIZE = 7
+WILDCARD = '*'
 
 SCRABBLE_LETTER_VALUES = {
     'a': 1, 'b': 3, 'c': 3, 'd': 2, 'e': 1, 'f': 4, 'g': 2, 'h': 4, 'i': 1, 'j': 8, 'k': 5, 'l': 1, 'm': 3, 'n': 1,
-    'o': 1, 'p': 3, 'q': 10, 'r': 1, 's': 1, 't': 1, 'u': 1, 'v': 4, 'w': 4, 'x': 8, 'y': 4, 'z': 10, '*': 0
+    'o': 1, 'p': 3, 'q': 10, 'r': 1, 's': 1, 't': 1, 'u': 1, 'v': 4, 'w': 4, 'x': 8, 'y': 4, 'z': 10
 }
 
 WORDLIST_FILENAME = "words.txt"
@@ -69,8 +72,7 @@ def get_word_score(word, n):
     for i in word:
         score_1 += SCRABBLE_LETTER_VALUES.get(i, 0)
     word_length = len(word)
-    score_2 = max(1, 7 * word_length - 3 * (n - word_length))
-    return score_1 * score_2
+    return score_1 * max(1, HAND_SIZE * word_length - 3 * (n - word_length))
 
 
 def display_hand(hand):
@@ -106,9 +108,10 @@ def deal_hand(n):
     for i in range(num_vowels):
         x = random.choice(VOWELS)
         hand[x] = hand.get(x, 0) + 1
-        
+
+    # remove last letter and add WILDCARD('*')
     del (hand[x])
-    hand["*"] = 1
+    hand[WILDCARD] = 1
 
     for i in range(num_vowels, n):
         x = random.choice(CONSONANTS)
@@ -126,19 +129,26 @@ def update_hand(hand, word):
     hand: dictionary (string -> int)    
     returns: dictionary (string -> int)
     """
+    # lowercase all letters
     word = word.lower()
+    # make hand copy
     new_hand = hand.copy()
+    # add set for letter which should remove
     remover = set()
+    # check all letter in new_hand
     for key in new_hand.keys():
         if key in word:
+            # counter show how many letters we should remove
             counter = max(0, new_hand[key] - word.count(key))
+            # if in new_hand zero letter, remove letter, else talk how letters new_hand have now
             if counter == 0:
                 remover.add(key)
             else:
                 new_hand[key] = counter
-
+    # remove from new_hand letters, which zero
     for key in remover:
         del new_hand[key]
+
     return new_hand
 
 
@@ -159,13 +169,14 @@ def is_valid_word(word, hand, word_list):
     for letter in word:
         if letter not in keys or working_hand[letter] == 0:
             return False
-        else:
-            working_hand[letter] -= 1
-            if letter == '*':
-                ind = word.index('*')
-                for vowel in VOWELS:
-                    if word[:ind] + vowel + word[ind + 1:] in word_list:
-                        return True
+        if letter == WILDCARD:
+            pattern = word.replace(WILDCARD, VOWELS_PATTERN)
+            working_hand[letter] -= word.count('*')
+            if re.search(pattern, str(word_list)):
+                return True
+            else:
+                False
+        working_hand[letter] -= 1
     return word in word_list
 
 
