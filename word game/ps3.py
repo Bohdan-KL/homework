@@ -231,7 +231,7 @@ def substitute_hand(hand, letter):
     
     hand: dictionary (string -> int)
     letter: string
-    returns: dictionary (string -> int) or string(if all letters in hand)
+    returns: dictionary (string -> int)
     """
     all_hands_letters = hand.keys()
     if letter not in all_hands_letters or set(all_hands_letters).intersection(set(VOWELS)) == set(VOWELS):
