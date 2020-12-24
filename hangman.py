@@ -18,7 +18,7 @@ INITIAL_WARNIGS = 3
 INITIAL_GUESSES = 6
 HINTS = "*"
 VOWELS = set('aeiou')
-
+VALID_LETTER = string.ascii_lowercase
 
 class ValidationResultType(Enum):
     NOT_CORRECT = 1
@@ -154,7 +154,8 @@ def inform_and_input(guesses_remaining, available_letters):
     '''
     print(f'You have {guesses_remaining} guesses left.')
     print(f'Available letters: {available_letters}')
-    return input('Please guess a letter: ')
+    letter = input('Please guess a letter: ').replace(' ', '')
+    return letter.lower()
 
 
 def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, with_hints):
@@ -182,11 +183,11 @@ def interactive_game(warnings_remaining, guesses_remaining, letters_guessed, sec
         if letter == HINTS and with_hints:
             show_possible_matches(guessed_word)
         # chek is user input a correct letter
-        elif not str.isalpha(letter):
+        elif letter not in VALID_LETTER or len(letter) != 1:
             warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(
                 ValidationResultType.NOT_CORRECT, warnings_remaining, guesses_remaining, guessed_word)
         # check is user input a new letter
-        elif str.lower(letter) in letters_guessed:
+        elif letter in letters_guessed:
             warnings_remaining, guesses_remaining, guessed_word = answer_if_bad(ValidationResultType.NOT_NEW,
                                                                                 warnings_remaining, guesses_remaining,
                                                                                 guessed_word)
@@ -252,7 +253,7 @@ def hangman(secret_word):
         total_points = interactive_game(warnings_remaining, guesses_remaining, letters_guessed, secret_word, False)
     if total_points > 0:
         print(f'Congratulations, you won! Your total score for this game is: '
-              f'{len(secret_word) * total_points}')
+              f'{len(set(secret_word)) * total_points}')
     else:
         print(f'Sorry, you ran out of guesses. The word was {secret_word}')
 
