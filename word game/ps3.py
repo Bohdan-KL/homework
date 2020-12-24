@@ -257,14 +257,14 @@ def play_game(word_list):
     return: the total score for the series of hands
     """
     total_score = 0
-    play_games_count = ask_user('Enter total number of hands: ')
+    play_games_count = ask_user_total_number()
     while play_games_count != 0:
         hand = deal_hand(HAND_SIZE)
         display_hand(hand)
         print()
-        is_substitute_hand = ask_user('Would you like to substitute a letter? ')
+        is_substitute_hand = ask_user_yes_no('Would you like to substitute a letter? ')
         if is_substitute_hand == "yes":
-            which_letter = ask_user('Which letter would you like to replace: ')
+            which_letter = ask_user_letter('Which letter would you like to replace: ')
             hand = substitute_hand(hand, which_letter)
         score_first = play_hand(hand, word_list)
         print('--------')
@@ -286,45 +286,60 @@ def replay_hand(hand, word_list):
 
     return: total score for game
     '''
-    is_replay_hand = ask_user('Would you like to replay the hand? ')
+    is_replay_hand = ask_user_yes_no('Would you like to replay the hand? ')
     total = False
     while is_replay_hand == 'yes':
         total = play_hand(hand, word_list)
         print('--------')
-        is_replay_hand = ask_user('Would you like to replay the hand? ')
+        is_replay_hand = ask_user_yes_no('Would you like to replay the hand? ')
     return total
 
 
-def ask_user(question):
+def ask_user_total_number():
     '''
-    Function for checking valid/invalid inputing.
+    Function for checking valid/invalid inputing. Ask total number.
     question: string, what user input
 
     return: string, valid item
     '''
-    if question == 'Enter total number of hands: ':
-        try:
-            count = int(input('Enter total number of hands: '))
-            if count > 0:
-                return count
-            else:
-                print('Total number must be greater than zero.')
-                return ask_user(question)
-        except:
-            print('Total number should be natural.')
-            return ask_user(question)
-    elif question == 'Would you like to substitute a letter? ' or question == 'Would you like to replay the hand? ':
+    try:
+        count = int(input('Enter total number of hands: '))
+        if count > 0:
+            return count
+        else:
+            print('Total number must be greater than zero.')
+            return ask_user_total_number()
+    except:
+        print('Total number should be natural.')
+        return ask_user_total_number()
+
+
+def ask_user_yes_no(question):
+    '''
+    Function for checking valid/invalid inputing. Ask yes-no.
+    question: string, what user input
+
+    return: string, valid item
+    '''
+    reaction = (input(question)).replace(' ', '')
+    while reaction != 'yes' and reaction != 'no':
+        print('Please, write yes or no.')
         reaction = (input(question)).replace(' ', '')
-        while reaction != 'yes' and reaction != 'no':
-            print('Please, write yes or no.')
-            reaction = (input(question)).replace(' ', '')
-        return reaction
-    elif question == 'Which letter would you like to replace: ':
+    return reaction
+
+
+def ask_user_letter(question):
+    '''
+    Function for checking valid/invalid inputing. Ask a letter.
+    question: string, what user input
+
+    return: string, valid item
+    '''
+    letter = (input(question)).replace(' ', '')
+    while not letter.isalpha() or len(letter) != 1:
+        print('Please, write only one letter.')
         letter = (input(question)).replace(' ', '')
-        while not letter.isalpha() or len(letter) != 1:
-            print('Please, write only one letter.')
-            letter = (input(question)).replace(' ', '')
-        return letter
+    return letter
 
 
 if __name__ == '__main__':
