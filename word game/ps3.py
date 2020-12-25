@@ -253,8 +253,10 @@ def play_game(word_list):
     word_list: list of lowercase strings
     return: the total score for the series of hands
     """
-    total_score = score_second = 0
-    is_substitute = is_replay = False
+    total_score = 0
+    score_second = 0
+    is_substitute = False
+    is_replay = False
     play_games_count = ask_user_total_number()
     while play_games_count != 0:
         print()
@@ -262,11 +264,12 @@ def play_game(word_list):
         display_hand(hand)
         if not is_substitute:
             hand, is_substitute = ask_substitute(hand)
+            print()
         score_first = play_hand(hand, word_list)
 
         if not is_replay:
-            hand, is_replay, score_second = replay_hand(hand, word_list)
-        if not score_second:
+            is_replay, score_second = replay_hand(hand, word_list)
+        if score_second == 0:
             total_score += score_first
         else:
             total_score += score_second
@@ -286,8 +289,8 @@ def replay_hand(hand, word_list):
     is_replay_hand = ask_user_yes_no('Would you like to replay the hand? ')
     if is_replay_hand == 'yes':
         total = play_hand(hand, word_list)
-        return hand, True, total
-    return hand, False, 0
+        return True, total
+    return False, 0
 
 
 def ask_substitute(hand):
@@ -301,9 +304,7 @@ def ask_substitute(hand):
     if is_substitute_hand == "yes":
         which_letter = ask_user_letter('Which letter would you like to replace: ')
         hand = substitute_hand(hand, which_letter)
-        print()
         return hand, True
-    print()
     return hand, False
 
 
@@ -316,13 +317,13 @@ def ask_user_total_number():
     '''
     try:
         count = int(input('Enter total number of hands: '))
-        if count > 0:
-            return count
-        else:
-            print('Total number must be greater than zero.')
-            return ask_user_total_number()
-    except:
+    except ValueError:
         print('Total number should be natural.')
+        return ask_user_total_number()
+    if count > 0:
+        return count
+    else:
+        print('Total number must be greater than zero.')
         return ask_user_total_number()
 
 
