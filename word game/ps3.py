@@ -160,20 +160,15 @@ def is_valid_word(word, hand, word_list):
     if set(hand.keys()).intersection(word_set) == word_set:
 
         # check is letters in word not too much
-        result = True
         for letter in word_set:
             if hand[letter] < word.count(letter):
-                result = False
-                break
+                return False
 
         # check is wildcard in word
-        if WILDCARD in word:
-            for letter in VOWELS:
-                if word.replace(WILDCARD, letter) in word_list:
-                    return True
-            return False
-
-        return result
+        for letter in VOWELS:
+            if word.replace(WILDCARD, letter) in word_list:
+                return True
+       
     return False
 
 
