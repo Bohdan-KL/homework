@@ -9,8 +9,8 @@
 
 import math
 import random
-from collections import Counter
 import re
+from collections import Counter
 
 VOWELS = 'aeiou'
 VOWELS_PATTERN = "['a','e','i','o','u']"
@@ -56,7 +56,12 @@ def get_frequency_dict(sequence):
     sequence: string or list
     return: dictionary
     """
-    return dict(Counter(sequence))
+
+    # freqs: dictionary (element_type -> int)
+    freq = {}
+    for x in sequence:
+        freq[x] = freq.get(x, 0) + 1
+    return freq
 
 
 def get_word_score(word, n):
@@ -68,10 +73,9 @@ def get_word_score(word, n):
     n: int >= 0
     returns: int >= 0
     """
-    word = word.lower()
     score_1 = 0
-    for i in word:
-        score_1 += SCRABBLE_LETTER_VALUES.get(i, 0)
+    for letter in word:
+        score_1 += SCRABBLE_LETTER_VALUES.get(letter, 0)
     word_length = len(word)
     return score_1 * max(1, HAND_SIZE * word_length - 3 * (n - word_length))
 
@@ -84,7 +88,7 @@ def display_hand(hand):
     """
     print('Current Hand: ', end=' ')
     for letter in hand.keys():
-        for j in range(hand[letter]):
+        for _ in range(hand[letter]):
             # print all on the same line
             print(letter, end=' ')
     return ''
@@ -103,16 +107,12 @@ def deal_hand(n):
     n: int >= 0
     returns: dictionary (string -> int)
     """
-    hand = {}
-    num_vowels = int(math.ceil(n / 3))
+    hand = {WILDCARD: 1}
+    num_vowels = int(math.ceil(n / 3)) - 1
 
     for i in range(num_vowels):
         x = random.choice(VOWELS)
         hand[x] = hand.get(x, 0) + 1
-
-    # remove last letter and add WILDCARD('*')
-    del (hand[x])
-    hand[WILDCARD] = 1
 
     for i in range(num_vowels, n):
         x = random.choice(CONSONANTS)
@@ -130,26 +130,13 @@ def update_hand(hand, word):
     hand: dictionary (string -> int)    
     returns: dictionary (string -> int)
     """
-    # lowercase all letters
-    word = word.lower()
-    # make hand copy
-    new_hand = hand.copy()
-    # add set for letter which should remove
-    remover = set()
-    # check all letter in new_hand
-    for key in new_hand.keys():
+    new_hand = {}
+    # check all letter in hand
+    for key in hand.keys():
         if key in word:
-            # counter show how many letters we should remove
-            counter = max(0, new_hand[key] - word.count(key))
-            # if in new_hand zero letter, remove letter, else talk how letters new_hand have now
-            if counter == 0:
-                remover.add(key)
-            else:
+            counter = hand[key] - word.count(key)
+            if counter > 0:
                 new_hand[key] = counter
-    # remove from new_hand letters, which zero
-    for key in remover:
-        del new_hand[key]
-
     return new_hand
 
 
@@ -164,21 +151,22 @@ def is_valid_word(word, hand, word_list):
     word_list: list of lowercase strings
     returns: boolean
     """
-    word = word.lower()
-    working_hand = hand.copy()
-    keys = working_hand.keys()
-    for letter in word:
-        if letter not in keys or working_hand[letter] == 0:
-            return False
-        if letter == WILDCARD:
+    pattern = word
+    word_dict = dict(Counter(word))
+    word_set = set(word)
+    # check is all letters from word set in intersection
+    if set(hand.keys()).intersection(word_set) == word_set:
+        # check is letters in word not too much
+        for letter in word_set:
+            if hand[letter] < word_dict[letter]:
+                return False
+        # check is wildcard in word
+        if WILDCARD in word:
             pattern = word.replace(WILDCARD, VOWELS_PATTERN)
-            working_hand[letter] -= word.count('*')
-            if re.search(pattern, str(word_list)):
-                return True
-            else:
-                False
-        working_hand[letter] -= 1
-    return word in word_list
+        # check is word in wordlist
+        if re.search(pattern, str(word_list)):
+            return True
+    return False
 
 
 def calculate_handlen(hand):
@@ -202,25 +190,25 @@ def play_hand(hand, word_list):
     total = 0
     # As long as there are still letters left in the hand:
     while hand:
-        print(display_hand(hand))
+        display_hand(hand)
+        print()
         word = input('Enter word, or “!!” to indicate that you are finished: ')
+        word = word.lower()
         if GAME_OVER == word:
             break
         else:
             if is_valid_word(word, hand, word_list):
                 word_total = get_word_score(word, len(hand))
                 total += word_total
-                print(f'“{word}” earned {word} points. Total: {total} points')
+                print(f'“{word}” earned {word_total} points. Total: {total} points')
             else:
                 print('This is not a valid word. Please choose another word.')
             print()
         hand = update_hand(hand, word)
     # Game is over (user entered '!!' or ran out of letters),
-    if GAME_OVER == word:
-        print(f'Total score for this hand: {total}')
-    else:
+    if GAME_OVER != word:
         print('Ran out of letters')
-        print(f'Total score for this hand: {total}')
+    print(f'Total score for this hand: {total}')
     return total
 
 
@@ -234,13 +222,18 @@ def substitute_hand(hand, letter):
     returns: dictionary (string -> int) 
     """
     all_hands_letters = hand.keys()
+    # here we check is all vowels letters in hand, or no. If all, return hand without changing
     if letter not in all_hands_letters or set(all_hands_letters).intersection(set(VOWELS)) == set(VOWELS):
         return hand
+    # choose random letter
     random_letter = random.choice(ALL_LETTERS)
+    # while letter also in hand, we choose other random letter
     while random_letter in all_hands_letters:
         random_letter = random.choice(ALL_LETTERS)
+    # make new_hand and changed it
     new_hand = hand.copy()
     new_hand[random_letter] = new_hand[letter]
+    # remove old letter
     del (new_hand[letter])
     return new_hand
 
@@ -284,12 +277,11 @@ def replay_hand(hand, word_list):
     return: total score for game
     '''
     is_replay_hand = ask_user_yes_no('Would you like to replay the hand? ')
-    total = False
-    while is_replay_hand == 'yes':
+    if is_replay_hand == 'yes':
         total = play_hand(hand, word_list)
-        print('--------')
-        is_replay_hand = ask_user_yes_no('Would you like to replay the hand? ')
-    return total
+        return total
+    else:
+        return 0
 
 
 def ask_user_total_number():
