@@ -108,9 +108,9 @@ def deal_hand(n):
     returns: dictionary (string -> int)
     """
     hand = {WILDCARD: 1}
-    num_vowels = int(math.ceil(n / 3)) - 1
+    num_vowels = int(math.ceil(n / 3))
 
-    for i in range(num_vowels):
+    for i in range(num_vowels-1):
         x = random.choice(VOWELS)
         hand[x] = hand.get(x, 0) + 1
 
